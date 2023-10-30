@@ -1,0 +1,23 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Bucket Polciy for Cross Account Access",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "QA_PIPELINE_CFN_ROLE_ARN",
+                    "QA_CFN_ROLE_ARN",
+					"PROD_PIPELINE_CFN_ROLE_ARN",
+                    "PROD_CFN_ROLE_ARN",
+                    "DEV_CODECOMMIT_ROLE_ARN"
+                ]
+            },
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::DEVOPS_CHKOUT_S3",
+                "arn:aws:s3:::DEVOPS_CHKOUT_S3/*"
+            ]
+        }
+    ]
+}

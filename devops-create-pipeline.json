@@ -1,0 +1,130 @@
+{
+    "pipeline": {
+        "name": "GLUE_PIPELINE_NAME",
+        "roleArn": "PIPELINE_EXECUTION_ROLE_ARN",
+        "artifactStore": {
+            "type": "S3",
+            "location": "DEVOPS_CHKOUT_S3",
+            "encryptionKey": {
+                "id": "DEVOPS_KMS_ARN",
+                "type": "KMS"
+            }
+        },
+        "stages": [
+            {
+                "name": "CheckOut",
+                "actions": [
+                    {
+                        "name": "Source",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "AWS",
+                            "provider": "CodeCommit",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BranchName": "main",
+                            "OutputArtifactFormat": "CODE_ZIP",
+                            "PollForSourceChanges": "true",
+                            "RepositoryName": "DEV_CODECOMMIT_REPO"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "inputArtifacts": [],
+                        "roleArn": "DEV_CODECOMMIT_ROLE_ARN",
+                        "region": "us-east-1",
+                        "namespace": "SourceVariables"
+                    }
+                ]
+            },
+			            {
+                "name": "Distribute",
+                "actions": [
+                    {
+                        "name": "DistributeCodeToQAEnv",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "S3",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "BucketName": "QA_SCRIPT_BUCKET",
+                            "Extract": "true"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+						"roleArn": "QA_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
+                    }
+                ]
+            },
+            {
+                "name": "DeployToQA",
+                "actions": [
+                    {
+                        "name": "CreateQAChangeSet",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ActionMode": "CHANGE_SET_REPLACE",
+                            "Capabilities": "CAPABILITY_NAMED_IAM",
+                            "ChangeSetName": "glue-change-set",
+                            "RoleArn": "QA_CFN_ROLE_ARN",
+                            "StackName": "glue-deploy-stack",
+                            "TemplateConfiguration": "SourceArtifact::createGluePropQA.json",
+                            "TemplatePath": "SourceArtifact::createGlue.yml"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "roleArn": "QA_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
+                    },
+                    {
+                        "name": "ExecuteQAChangeSet",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 2,
+                        "configuration": {
+                            "ActionMode": "CHANGE_SET_EXECUTE",
+                            "ChangeSetName": "glue-change-set",
+                            "RoleArn": "QA_CFN_ROLE_ARN",
+                            "StackName": "glue-deploy-stack"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "roleArn": "QA_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
+                    }
+                ]
+            }
+        ],
+        "version": 1
+    }
+}

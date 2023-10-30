@@ -1,0 +1,66 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "CloudWatch",
+            "Effect": "Allow",
+            "Action": "cloudwatch:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "AssumeRole",
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Resource": [
+                "QA_PIPELINE_CFN_ROLE_ARN",
+                "QA_CFN_ROLE_ARN",
+				"PROD_PIPELINE_CFN_ROLE_ARN",
+                "PROD_CFN_ROLE_ARN",
+                "DEV_CODECOMMIT_ROLE_ARN"
+            ]
+        },
+        {
+            "Sid": "PassRole",
+            "Effect": "Allow",
+            "Action": [
+                "iam:PassRole"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "cloudformation",
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:*"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "kms",
+            "Effect": "Allow",
+            "Action": [
+                "kms:*"
+            ],
+            "Resource": [
+                "DEVOPS_KMS_ARN"
+            ]
+        },
+        {
+            "Sid": "s3",
+            "Effect": "Allow",
+            "Action": [
+                "s3:*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::DEVOPS_CHKOUT_S3",
+                "arn:aws:s3:::DEVOPS_CHKOUT_S3/*"
+            ]
+        }
+    ]
+}

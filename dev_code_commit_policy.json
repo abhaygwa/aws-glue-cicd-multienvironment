@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "codecommit:BatchGetRepositories",
+                "codecommit:Get*",
+                "codecommit:GitPull",
+                "codecommit:List*",
+                "codecommit:CancelUploadArchive",
+                "codecommit:UploadArchive",
+                "s3:*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "kms:*"
+            ],
+            "Resource": "DEVOPS_KMS_ARN",
+            "Effect": "Allow"
+        }
+    ]
+}

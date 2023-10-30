@@ -1,0 +1,35 @@
+{
+    "Version": "2012-10-17",
+    "Id": "crossact-kms-key-for-glue",
+    "Statement": [
+        {
+            "Sid": "Allows admin of the key",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::DEVOPS_ACT_NO:root"
+            },
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "Usage Of Key",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::QA_ACT_NO:root",
+                    "arn:aws:iam::DEV_ACT_NO:root",
+                    "arn:aws:iam::PROD_ACT_NO:root",
+                    "arn:aws:iam::DEVOPS_ACT_NO:root"
+                ]
+            },
+            "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
