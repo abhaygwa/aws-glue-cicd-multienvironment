@@ -65,6 +65,28 @@
                         ],
 						"roleArn": "QA_PIPELINE_CFN_ROLE_ARN",
                         "region": "us-east-1"
+                    },
+					{
+                        "name": "DistributeCodeToPRODEnv",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "S3",
+                            "version": "1"
+                        },
+                        "runOrder": 2,
+                        "configuration": {
+                            "BucketName": "PROD_SCRIPT_BUCKET",
+                            "Extract": "true"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+						"roleArn": "PROD_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
                     }
                 ]
             },
@@ -120,6 +142,62 @@
                             }
                         ],
                         "roleArn": "QA_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
+                    }
+                ]
+            },
+			{
+                "name": "DeployToQA",
+                "actions": [
+                    {
+                        "name": "CreatePRODChangeSet",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ActionMode": "CHANGE_SET_REPLACE",
+                            "Capabilities": "CAPABILITY_NAMED_IAM",
+                            "ChangeSetName": "glue-change-set",
+                            "RoleArn": "PROD_CFN_ROLE_ARN",
+                            "StackName": "glue-deploy-stack",
+                            "TemplateConfiguration": "SourceArtifact::createGluePropPROD.json",
+                            "TemplatePath": "SourceArtifact::createGlue.yml"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "roleArn": "PROD_PIPELINE_CFN_ROLE_ARN",
+                        "region": "us-east-1"
+                    },
+                    {
+                        "name": "ExecutePRODChangeSet",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 2,
+                        "configuration": {
+                            "ActionMode": "CHANGE_SET_EXECUTE",
+                            "ChangeSetName": "glue-change-set",
+                            "RoleArn": "PROD_CFN_ROLE_ARN",
+                            "StackName": "glue-deploy-stack"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "roleArn": "PROD_PIPELINE_CFN_ROLE_ARN",
                         "region": "us-east-1"
                     }
                 ]
